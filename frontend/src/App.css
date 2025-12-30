@@ -1,0 +1,109 @@
+/* Center everything */
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: sans-serif;
+}
+
+.input-area {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+textarea {
+  width: 100%;
+  height: 100px;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+/* --- THE MAGIC PART: Interactive Words --- */
+.result-box {
+  line-height: 2.5; /* Space lines out so popups fit */
+  font-size: 1.2rem;
+}
+
+.interactive-word {
+  position: relative;
+  cursor: help;
+  padding: 2px 4px;
+  margin: 0 2px;
+  border-bottom: 2px dotted #aaa; /* Visual hint */
+  transition: background 0.2s;
+}
+
+.interactive-word:hover {
+  background-color: #eef;
+}
+
+/* Tooltip (Popup) Logic */
+.interactive-word::after {
+  content: attr(data-trans); /* Grab translation from HTML */
+  position: absolute;
+  bottom: 120%; /* Position above word */
+  left: 50%;
+  transform: translateX(-50%);
+  
+  background-color: #333;
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  
+  /* Hidden by default */
+  opacity: 0; 
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+/* Show popup on hover */
+.interactive-word:hover::after {
+  opacity: 1;
+}
+
+/* WORD FOR WORD MODE: Show all popups permanently */
+.show-all .interactive-word::after {
+  opacity: 1;
+  position: static; /* Sit normally in flow */
+  display: block;   /* Force new line */
+  transform: none;
+  background: none;
+  color: #007bff;
+  font-size: 0.7em;
+  padding: 0;
+  text-align: center;
+}
+
+
+/* ... keep all your existing code ... */
+
+/* RTL Support for Arabic */
+.rtl-mode {
+  direction: rtl;
+  text-align: right;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Better Arabic font */
+}
+
+/* Adjust the popup for Arabic words */
+.rtl-mode .interactive-word::after {
+  /* Optional: keeps the English popup readable */
+  direction: ltr; 
+  text-align: left;
+}
