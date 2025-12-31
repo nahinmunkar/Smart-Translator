@@ -25,18 +25,19 @@ function App() {
         body: JSON.stringify({ text: inputText, target_lang: targetLang }),
       });
 
-      const result = await response.json();
-
       if (!response.ok) {
+        const result = await response.json();
         throw new Error(result.detail || "Translation failed");
       }
 
+      const result = await response.json();
       setData(result);
     } catch (err) {
       console.error("Error:", err);
       setError(err.message);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   // Determine if we should use Right-to-Left layout
@@ -60,7 +61,7 @@ function App() {
           <option value="German">Translate to German</option>
         </select>
         
-        <button onClick={handleTranslate} disabled={loading}>
+        <button onClick={handleTranslate} disabled={loading || !inputText.trim()}>
           {loading ? "Translating..." : "Go"}
         </button>
       </div>

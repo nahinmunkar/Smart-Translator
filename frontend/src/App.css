@@ -1,109 +1,193 @@
-/* Center everything */
+/* =========================================
+   1. GLOBAL LAYOUT & UTILITIES
+   ========================================= */
 .container {
-  max-width: 800px;
+  max-width: 900px; /* Slightly wider for better reading */
   margin: 0 auto;
   padding: 2rem;
-  font-family: sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  color: #333;
 }
 
+h1 {
+  text-align: center;
+  color: #2c3e50;
+  margin-bottom: 30px;
+}
+
+/* Input Area Styling */
 .input-area {
   display: flex;
+  flex-direction: column;
   gap: 10px;
   margin-bottom: 20px;
 }
 
 textarea {
   width: 100%;
-  height: 100px;
-  padding: 10px;
+  height: 120px;
+  padding: 15px;
+  font-size: 1.1rem;
   border-radius: 8px;
-  border: 1px solid #ccc;
+  border: 1px solid #ddd;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+  resize: vertical;
+  font-family: inherit;
 }
 
+textarea:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
+}
+
+/* Button & Select Styling */
 button {
-  padding: 10px 20px;
+  padding: 12px 24px;
   background-color: #007bff;
   color: white;
   border: none;
-  border-radius: 5px;
+  border-radius: 6px;
   cursor: pointer;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: background-color 0.2s;
 }
 
 button:hover {
   background-color: #0056b3;
 }
 
-/* --- THE MAGIC PART: Interactive Words --- */
-.result-box {
-  line-height: 2.5; /* Space lines out so popups fit */
-  font-size: 1.2rem;
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
 }
 
+select {
+  padding: 10px 15px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  background-color: white;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+/* =========================================
+   2. INTERACTIVE READER (The Result Box)
+   ========================================= */
+
+.result-box {
+  /* Critical: Huge line-height gives space for subtitles to sit between lines */
+  line-height: 3; 
+  font-size: 1.4rem;
+  margin-top: 25px;
+  padding: 30px;
+  background-color: #fff;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+/* Individual Interactive Word */
 .interactive-word {
   position: relative;
   cursor: help;
-  padding: 2px 4px;
-  margin: 0 2px;
-  border-bottom: 2px dotted #aaa; /* Visual hint */
-  transition: background 0.2s;
+  padding: 0 2px;
+  margin: 0 3px;
+  border-bottom: 2px dotted #bbb; /* Visual cue */
+  border-radius: 4px;
+  transition: all 0.2s ease;
+
+  /* FLEXBOX MAGIC: This handles the stacking and width automatically */
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;        /* Centers translation under word */
+  vertical-align: top;        /* Keeps original text aligned in a straight line */
 }
 
 .interactive-word:hover {
-  background-color: #eef;
+  background-color: #e6f2ff;
+  border-bottom-color: #007bff;
 }
 
-/* Tooltip (Popup) Logic */
+/* =========================================
+   3. MODE A: HOVER POPUP (Default)
+   ========================================= */
+
 .interactive-word::after {
-  content: attr(data-trans); /* Grab translation from HTML */
+  content: attr(data-trans); /* Grab text from HTML */
+  
+  /* Positioning: Float above */
   position: absolute;
-  bottom: 120%; /* Position above word */
+  bottom: 110%; 
   left: 50%;
   transform: translateX(-50%);
   
-  background-color: #333;
+  /* Visuals */
+  background-color: #2d3436;
   color: #fff;
-  padding: 5px 10px;
-  border-radius: 4px;
-  font-size: 0.8rem;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.9rem;
   white-space: nowrap;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
   
-  /* Hidden by default */
+  /* Animation */
   opacity: 0; 
   pointer-events: none;
-  transition: opacity 0.2s;
+  transition: opacity 0.2s, transform 0.2s;
+  z-index: 100;
 }
 
-/* Show popup on hover */
+/* Show on hover */
 .interactive-word:hover::after {
   opacity: 1;
+  transform: translateX(-50%) translateY(-5px);
 }
 
-/* WORD FOR WORD MODE: Show all popups permanently */
+/* =========================================
+   4. MODE B: SUBTITLES (Show All)
+   ========================================= */
+/* These rules apply when you click the "Show Subtitles" button */
+
+.show-all .interactive-word {
+  border-bottom: none; /* Clean look */
+  margin-bottom: 0.5em; /* Extra push to prevent crashing into line below */
+}
+
 .show-all .interactive-word::after {
-  opacity: 1;
-  position: static; /* Sit normally in flow */
-  display: block;   /* Force new line */
+  /* Reset the floating popup styles */
+  position: static;
   transform: none;
-  background: none;
-  color: #007bff;
-  font-size: 0.7em;
-  padding: 0;
-  text-align: center;
+  background: transparent;
+  box-shadow: none;
+  pointer-events: auto;
+  
+  /* Subtitle Look */
+  opacity: 1;
+  display: block;
+  color: #007bff; /* Blue text */
+  font-size: 0.75rem; /* Smaller size */
+  font-weight: 700;
+  margin-top: 2px;
+  
+  /* LAYOUT FIXES FOR LONG WORDS */
+  white-space: nowrap; /* Forces translation to be 1 line */
+  width: max-content;  /* Forces word container to widen if translation is long */
 }
 
+/* =========================================
+   5. ARABIC / RTL SUPPORT
+   ========================================= */
 
-/* ... keep all your existing code ... */
-
-/* RTL Support for Arabic */
 .rtl-mode {
   direction: rtl;
   text-align: right;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Better Arabic font */
+  font-family: 'Segoe UI', Tahoma, 'Arial', sans-serif;
 }
 
-/* Adjust the popup for Arabic words */
+/* Even in Arabic mode, keep English subtitles LTR */
 .rtl-mode .interactive-word::after {
-  /* Optional: keeps the English popup readable */
-  direction: ltr; 
+  direction: ltr;
   text-align: left;
 }
